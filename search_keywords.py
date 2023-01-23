@@ -8,6 +8,7 @@ import shutil
 import argparse
 import traceback
 import xlsxwriter
+import numpy as np
 import pandas as pd
 from colorama import init
 init()
@@ -28,8 +29,8 @@ def menu(args):
 
     osk.FOLDER_TXT = os.path.join(folder_path, folder_name)
     if not osk.check_path(osk.FOLDER_TXT):
-        osk.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), osk.FOLDER_TXT), showdate = False)
-        osk.show_print("%s: error: the following arguments are required: -ft/--folder_txt" % os.path.basename(__file__), showdate = False)
+        osk.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), osk.FOLDER_TXT), showdate = False, font = oscihub.YELLOW)
+        osk.show_print("%s: error: the following arguments are required: -ft/--folder_txt" % os.path.basename(__file__), showdate = False, font = oscihub.YELLOW)
         exit()
 
     folder_name = os.path.basename(args.folder_pdf)
@@ -39,8 +40,8 @@ def menu(args):
 
     osk.FOLDER_PDF = os.path.join(folder_path, folder_name)
     if not osk.check_path(osk.FOLDER_PDF):
-        osk.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), osk.FOLDER_TXT), showdate = False)
-        osk.show_print("%s: error: the following arguments are required: -fp/--folder_pdf" % os.path.basename(__file__), showdate = False)
+        osk.show_print("%s: error: the folder '%s' doesn't exist" % (os.path.basename(__file__), osk.FOLDER_TXT), showdate = False, font = oscihub.YELLOW)
+        osk.show_print("%s: error: the following arguments are required: -fp/--folder_pdf" % os.path.basename(__file__), showdate = False, font = oscihub.YELLOW)
         exit()
 
     # osk.SECTION = args.section
@@ -52,8 +53,8 @@ def menu(args):
 
     osk.KEYWORDS = os.path.join(kw_file_path, kw_file_name)
     if not osk.check_path(osk.KEYWORDS):
-        osk.show_print("%s: error: the file '%s' doesn't exist" % (os.path.basename(__file__), osk.KEYWORDS), showdate = False)
-        osk.show_print("%s: error: the following arguments are required: -kw/--keywords" % os.path.basename(__file__), showdate = False)
+        osk.show_print("%s: error: the file '%s' doesn't exist" % (os.path.basename(__file__), osk.KEYWORDS), showdate = False, font = oscihub.YELLOW)
+        osk.show_print("%s: error: the following arguments are required: -kw/--keywords" % os.path.basename(__file__), showdate = False, font = oscihub.YELLOW)
         exit()
 
     if args.output is not None:
@@ -65,7 +66,7 @@ def menu(args):
         osk.OUTPUT_PATH = os.path.join(output_path, output_name)
         created = osk.create_directory(osk.OUTPUT_PATH)
         if not created:
-            osk.show_print("%s: error: Couldn't create folder '%s'" % (os.path.basename(__file__), osk.OUTPUT_PATH), showdate = False)
+            osk.show_print("%s: error: Couldn't create folder '%s'" % (os.path.basename(__file__), osk.OUTPUT_PATH), showdate = False, font = oscihub.YELLOW)
             exit()
     else:
         osk.OUTPUT_PATH = os.getcwd().strip()
@@ -221,7 +222,8 @@ class SearchKW:
         dict_txt = {}
         if self.check_path(self.XLS_FILE_CONVERTED):
             df = pd.read_excel(io = self.XLS_FILE_CONVERTED, sheet_name = self.XLS_SHEET_DETAIL)
-            df = df.where(pd.notnull(df), None)
+            # df = df.where(pd.notnull(df), None)
+            df = df.replace({np.nan: None})
 
             for idx, row in df.iterrows():
                 if row[self.xls_col_converted] == self.STATUS_OK:
